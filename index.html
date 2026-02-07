@@ -42,8 +42,8 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
-    #copyBtn {
-      margin-top: 15px;
+    button {
+      margin: 10px 5px;
       padding: 12px 24px;
       font-size: 1.2rem;
       background: #00ff41;
@@ -53,8 +53,18 @@
       cursor: pointer;
       font-weight: bold;
     }
-    #copyBtn:hover {
+    button:hover {
       background: #00cc33;
+    }
+    #shareLink {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0, 255, 65, 0.1);
+      border: 1px solid #00ff41;
+      border-radius: 8px;
+      word-break: break-all;
+      max-width: 100%;
+      display: none;
     }
     .info {
       font-size: 1.1rem;
@@ -67,11 +77,14 @@
   <div class="container">
     <h1>ENGRISH TRANSRATOR<br>– BIRRIONS GO BRRRRR –</h1>
 
-    <textarea id="input" placeholder="Type English here... every word will get accent"></textarea>
+    <textarea id="input" placeholder="Type English here..."></textarea>
 
     <div id="output">Herro! Type something prease</div>
 
     <button id="copyBtn">Copy Engrish</button>
+    <button id="shareBtn">Share this Translation</button>
+
+    <div id="shareLink"></div>
 
     <div class="info">
       prease no take offense, just funny. tank you come again lah~
@@ -82,15 +95,18 @@
     const input = document.getElementById('input');
     const output = document.getElementById('output');
     const copyBtn = document.getElementById('copyBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const shareLink = document.getElementById('shareLink');
 
     function toEngrish(str) {
       if (!str.trim()) return 'Herro! Type something prease';
 
       let t = str.toLowerCase();
 
-      // Heavy core phonetic rules
-      t = t.replace(/l/g, 'r');                     // L → R everywhere
-      t = t.replace(/r([aeiou])/g, 'l$1');          // occasional R → L
+      // Extreme core swaps
+      t = t.replace(/l/g, 'r');
+      t = t.replace(/r/g, 'l');
+      t = t.replace(/l/g, 'r'); // double pass
 
       t = t.replace(/th/g, 'z');
       t = t.replace(/th([aeiou])/g, 'd$1');
@@ -101,7 +117,7 @@
       t = t.replace(/([aeiou])r([aeiou])/g, '$1ru$2');
       t = t.replace(/([aeiou])r\b/g, '$1r');
 
-      // Word replacements
+      // Word replacements (before extreme vowels)
       t = t.replace(/\bi\b/g, 'ai');
       t = t.replace(/\bme\b/g, 'mi');
       t = t.replace(/\byou\b/g, 'yu');
@@ -139,18 +155,24 @@
       t = t.replace(/\bwant\b/g, 'wan');
       t = t.replace(/\blike\b/g, 'raikku');
 
-      // FINAL step: force "billion" (any case) to "birrion" with DOUBLE r
-      // This runs AFTER all other replacements so nothing can touch it again
+      // FINAL override: force "billion" to "birrion" (double r)
       t = t.replace(/\bbillion\b/gi, 'birrion');
 
-      // Protect "birrion" from any future L/R swaps (just in case)
-      t = t.replace(/birrion/gi, 'BIRRION_PLACEHOLDER');
-      t = t.replace(/l/g, 'r');  // re-apply if needed, but placeholder is safe
-      t = t.replace(/BIRRION_PLACEHOLDER/gi, 'birrion');
+      // LOCK: protect "birrion" from vowel stretching & further changes
+      t = t.replace(/birrion/gi, 'BIRRION_LOCK');
 
-      // NO particles whatsoever
+      // Extreme vowel stretching (skips locked words)
+      t = t.replace(/a([bcdfghjklmnpqrstvwxyz])/g, 'ah$1');
+      t = t.replace(/e([bcdfghjklmnpqrstvwxyz])/g, 'eh$1');
+      t = t.replace(/i([bcdfghjklmnpqrstvwxyz])/g, 'ee$1');
+      t = t.replace(/o([bcdfghjklmnpqrstvwxyz])/g, 'oh$1');
+      t = t.replace(/u([bcdfghjklmnpqrstvwxyz])/g, 'oo$1');
 
-      // Capitalize first letter
+      // Restore locked birrion after all rules
+      t = t.replace(/BIRRION_LOCK/gi, 'birrion');
+
+      // NO particles
+
       t = t.charAt(0).toUpperCase() + t.slice(1);
 
       return t;
@@ -175,6 +197,41 @@
         });
       } else {
         alert('Nothing to copy – type something first!');
+      }
+    });
+
+    shareBtn.addEventListener('click', () => {
+      const original = input.value.trim();
+      const translated = output.textContent.trim();
+      if (!original || translated === 'Herro! Type something prease') {
+        alert('Nothing to share – type something first!');
+        return;
+      }
+
+      const data = btoa(JSON.stringify({ o: original, t: translated }));
+      const shareUrl = `${window.location.origin}${window.location.pathname}?s=${data}`;
+
+      shareLink.textContent = shareUrl;
+      shareLink.style.display = 'block';
+
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('Link copied! Send it to someone lah~');
+      }).catch(() => {
+        alert('Link generated (copy manually):\n' + shareUrl);
+      });
+    });
+
+    window.addEventListener('load', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const shared = urlParams.get('s');
+      if (shared) {
+        try {
+          const decoded = JSON.parse(atob(shared));
+          input.value = decoded.o;
+          output.textContent = decoded.t;
+        } catch (e) {
+          console.error('Invalid share link');
+        }
       }
     });
   </script>
