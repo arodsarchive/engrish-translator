@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Engrish Translator – Birrion Edition</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0a0a0a;
+      color: #00ff41;
+      margin: 0;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3.2rem;
+      margin-bottom: 0.4em;
+      text-shadow: 0 0 10px #00ff41;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    textarea, #output {
+      width: 100%;
+      min-height: 180px;
+      font-size: 1.4rem;
+      padding: 20px;
+      border: 2px solid #00ff41;
+      border-radius: 12px;
+      background: #000;
+      color: #00ff41;
+      resize: vertical;
+      box-sizing: border-box;
+      margin: 20px 0;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    #output {
+      background: #001100;
+      min-height: 140px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    #copyBtn {
+      margin-top: 15px;
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      background: #00ff41;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #copyBtn:hover {
+      background: #00cc33;
+    }
+    .info {
+      font-size: 1.1rem;
+      opacity: 0.8;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ENGRISH TRANSRATOR<br>– BIRRIONS GO BRRRRR –</h1>
+
+    <textarea id="input" placeholder="Type English here... every word will get accent"></textarea>
+
+    <div id="output">Herro! Type something prease</div>
+
+    <button id="copyBtn">Copy Engrish</button>
+
+    <div class="info">
+      prease no take offense, just funny. tank you come again lah~
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function toEngrish(str) {
+      if (!str.trim()) return 'Herro! Type something prease';
+
+      let t = str.toLowerCase();
+
+      // Heavy core phonetic rules – applied aggressively
+      t = t.replace(/l/g, 'r');                     // L → R everywhere
+      t = t.replace(/r([aeiou])/g, 'l$1');          // R → L sometimes
+      t = t.replace(/th/g, 'z');                    // th → z
+      t = t.replace(/th([aeiou])/g, 'd$1');         // th → d sometimes
+      t = t.replace(/v/g, 'b');                     // v → b
+      t = t.replace(/f([aeiou])/g, 'p$1');          // f → p
+      t = t.replace(/f/g, 'fu');                    // f → fu
+      t = t.replace(/s([aeiou])/g, 'su$1');         // s → su
+      t = t.replace(/([aeiou])r([aeiou])/g, '$1ru$2'); // r → ru
+      t = t.replace(/([aeiou])r\b/g, '$1r');        // word-end r softened
+
+      // Word replacements – touch almost every common word
+      t = t.replace(/\bi\b/g, 'ai');
+      t = t.replace(/\bme\b/g, 'mi');
+      t = t.replace(/\byou\b/g, 'yu');
+      t = t.replace(/\bmy\b/g, 'mai');
+      t = t.replace(/\byour\b/g, 'yua');
+      t = t.replace(/\bthe\b/g, 'da');
+      t = t.replace(/\band\b/g, 'an');
+      t = t.replace(/\bis\b/g, 'iz');
+      t = t.replace(/\bit\b/g, 'ito');
+      t = t.replace(/\bthis\b/g, 'disu');
+      t = t.replace(/\bthat\b/g, 'dat');
+      t = t.replace(/\bwhat\b/g, 'watu');
+      t = t.replace(/\bhow\b/g, 'hau');
+      t = t.replace(/\btoo\b/g, 'tu');
+      t = t.replace(/\blow\b/g, 'roo');
+      t = t.replace(/\bvery\b/g, 'bery');
+      t = t.replace(/\bplease\b/g, 'prease');
+      t = t.replace(/\bhello\b/g, 'herro');
+      t = t.replace(/\bfriend\b/g, 'fwiend');
+      t = t.replace(/\bmillion\b/g, 'mirrion');
+      t = t.replace(/\bbillion\b/g, 'birrion');
+      t = t.replace(/\bprice\b/g, 'plice');
+      t = t.replace(/\bcoin\b/g, 'koin');
+      t = t.replace(/\bgood\b/g, 'gud');
+      t = t.replace(/\bthink\b/g, 'zink');
+      t = t.replace(/\bshit\b/g, 'shitu');
+      t = t.replace(/\bfuck\b/g, 'faku');
+      t = t.replace(/\bright\b/g, 'raito');
+      t = t.replace(/\bthree\b/g, 'sree');
+      t = t.replace(/\bfive\b/g, 'paibu');
+      t = t.replace(/\bnumber\b/g, 'numbah');
+      t = t.replace(/\btime\b/g, 'taimu');
+      t = t.replace(/\bnow\b/g, 'nau');
+      t = t.replace(/\bgo\b/g, 'goh');
+      t = t.replace(/\bcome\b/g, 'kum');
+      t = t.replace(/\bwant\b/g, 'wan');
+      t = t.replace(/\blike\b/g, 'raikku');
+
+      // Light particles – rare and single
+      const endings = [' lah~', ' ah?', ' sia~', ' hor~', ' leh~'];
+      if (Math.random() > 0.6) {  // ~40% chance
+        const ending = endings[Math.floor(Math.random() * endings.length)];
+        t += ending;
+      }
+
+      // Capitalize first letter
+      t = t.charAt(0).toUpperCase() + t.slice(1);
+
+      return t;
+    }
+
+    // Live translation
+    input.addEventListener('input', () => {
+      output.textContent = toEngrish(input.value);
+    });
+
+    // Copy button
+    copyBtn.addEventListener('click', () => {
+      const text = output.textContent;
+      if (text && text.trim() !== '' && text !== 'Herro! Type something prease') {
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.textContent = 'Copied lah~!';
+          copyBtn.style.background = '#ffcc00';
+          setTimeout(() => {
+            copyBtn.textContent = 'Copy Engrish';
+            copyBtn.style.background = '#00ff41';
+          }, 2000);
+        }).catch(() => {
+          alert('Copy failed – try highlighting manually.');
+        });
+      } else {
+        alert('Nothing to copy – type something first!');
+      }
+    });
+  </script>
+</body>
+</html>
