@@ -88,19 +88,20 @@
 
       let t = str.toLowerCase();
 
-      // Heavy core phonetic rules – applied aggressively
+      // Heavy core phonetic rules
       t = t.replace(/l/g, 'r');                     // L → R everywhere
-      t = t.replace(/r([aeiou])/g, 'l$1');          // R → L sometimes
-      t = t.replace(/th/g, 'z');                    // th → z
-      t = t.replace(/th([aeiou])/g, 'd$1');         // th → d sometimes
-      t = t.replace(/v/g, 'b');                     // v → b
-      t = t.replace(/f([aeiou])/g, 'p$1');          // f → p
-      t = t.replace(/f/g, 'fu');                    // f → fu
-      t = t.replace(/s([aeiou])/g, 'su$1');         // s → su
-      t = t.replace(/([aeiou])r([aeiou])/g, '$1ru$2'); // r → ru
-      t = t.replace(/([aeiou])r\b/g, '$1r');        // word-end r softened
+      t = t.replace(/r([aeiou])/g, 'l$1');          // occasional R → L
 
-      // Word replacements – touch every common word
+      t = t.replace(/th/g, 'z');
+      t = t.replace(/th([aeiou])/g, 'd$1');
+      t = t.replace(/v/g, 'b');
+      t = t.replace(/f([aeiou])/g, 'p$1');
+      t = t.replace(/f/g, 'fu');
+      t = t.replace(/s([aeiou])/g, 'su$1');
+      t = t.replace(/([aeiou])r([aeiou])/g, '$1ru$2');
+      t = t.replace(/([aeiou])r\b/g, '$1r');
+
+      // Word replacements
       t = t.replace(/\bi\b/g, 'ai');
       t = t.replace(/\bme\b/g, 'mi');
       t = t.replace(/\byou\b/g, 'yu');
@@ -121,7 +122,6 @@
       t = t.replace(/\bhello\b/g, 'herro');
       t = t.replace(/\bfriend\b/g, 'fwiend');
       t = t.replace(/\bmillion\b/g, 'mirrion');
-      t = t.replace(/\bbillion\b/g, 'birrion');
       t = t.replace(/\bprice\b/g, 'plice');
       t = t.replace(/\bcoin\b/g, 'koin');
       t = t.replace(/\bgood\b/g, 'gud');
@@ -139,12 +139,16 @@
       t = t.replace(/\bwant\b/g, 'wan');
       t = t.replace(/\blike\b/g, 'raikku');
 
-      // Light particles – rare and single
-      const endings = [' lah~', ' ah?', ' sia~', ' hor~', ' leh~'];
-      if (Math.random() > 0.6) {  // ~40% chance
-        const ending = endings[Math.floor(Math.random() * endings.length)];
-        t += ending;
-      }
+      // FINAL step: force "billion" (any case) to "birrion" with DOUBLE r
+      // This runs AFTER all other replacements so nothing can touch it again
+      t = t.replace(/\bbillion\b/gi, 'birrion');
+
+      // Protect "birrion" from any future L/R swaps (just in case)
+      t = t.replace(/birrion/gi, 'BIRRION_PLACEHOLDER');
+      t = t.replace(/l/g, 'r');  // re-apply if needed, but placeholder is safe
+      t = t.replace(/BIRRION_PLACEHOLDER/gi, 'birrion');
+
+      // NO particles whatsoever
 
       // Capitalize first letter
       t = t.charAt(0).toUpperCase() + t.slice(1);
@@ -152,17 +156,15 @@
       return t;
     }
 
-    // Live translation
     input.addEventListener('input', () => {
       output.textContent = toEngrish(input.value);
     });
 
-    // Copy button
     copyBtn.addEventListener('click', () => {
       const text = output.textContent;
       if (text && text.trim() !== '' && text !== 'Herro! Type something prease') {
         navigator.clipboard.writeText(text).then(() => {
-          copyBtn.textContent = 'Copied lah~!';
+          copyBtn.textContent = 'Copied!';
           copyBtn.style.background = '#ffcc00';
           setTimeout(() => {
             copyBtn.textContent = 'Copy Engrish';
