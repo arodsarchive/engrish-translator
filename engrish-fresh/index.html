@@ -77,7 +77,7 @@
   <div class="container">
     <h1>ENGRISH TRANSRATOR<br>– BIRRIONS GO BRRRRR –</h1>
 
-    <textarea id="input" placeholder="Type English here... every word gets extreme accent"></textarea>
+    <textarea id="input" placeholder="Type English here..."></textarea>
 
     <div id="output">Herro! Type something prease</div>
 
@@ -103,26 +103,26 @@
 
       let t = str.toLowerCase();
 
-      // EXTREME accent rules - applied very aggressively
+      // Heavy core phonetic rules
       t = t.replace(/l/g, 'r');                     // L → R everywhere
-      t = t.replace(/r/g, 'l');                     // R → L everywhere (double swap for max chaos)
-      t = t.replace(/th/g, 'z');                    // th → z
-      t = t.replace(/th([aeiou])/g, 'd$1');         // th → d
-      t = t.replace(/v/g, 'b');                     // v → b
-      t = t.replace(/f([aeiou])/g, 'p$1');          // f → p
-      t = t.replace(/f/g, 'fu');                    // f → fu
-      t = t.replace(/s([aeiou])/g, 'su$1');         // s → su
-      t = t.replace(/([aeiou])r([aeiou])/g, '$1ru$2'); // r → ru
-      t = t.replace(/([aeiou])r\b/g, '$1r');        // end r softened
+      t = t.replace(/r([aeiou])/g, 'l$1');          // occasional R → L
+      t = t.replace(/th/g, 'z');
+      t = t.replace(/th([aeiou])/g, 'd$1');
+      t = t.replace(/v/g, 'b');
+      t = t.replace(/f([aeiou])/g, 'p$1');
+      t = t.replace(/f/g, 'fu');
+      t = t.replace(/s([aeiou])/g, 'su$1');
+      t = t.replace(/([aeiou])r([aeiou])/g, '$1ru$2');
+      t = t.replace(/([aeiou])r\b/g, '$1r');
 
-      // Extra extreme insertions (every vowel gets a chance to break)
-      t = t.replace(/a/g, 'ah');
-      t = t.replace(/e/g, 'eh');
-      t = t.replace(/i/g, 'ee');
-      t = t.replace(/o/g, 'oh');
-      t = t.replace(/u/g, 'oo');
+      // Extreme vowel stretching
+      t = t.replace(/a([bcdfghjklmnpqrstvwxyz])/g, 'ah$1');
+      t = t.replace(/e([bcdfghjklmnpqrstvwxyz])/g, 'eh$1');
+      t = t.replace(/i([bcdfghjklmnpqrstvwxyz])/g, 'ee$1');
+      t = t.replace(/o([bcdfghjklmnpqrstvwxyz])/g, 'oh$1');
+      t = t.replace(/u([bcdfghjklmnpqrstvwxyz])/g, 'oo$1');
 
-      // Word replacements - hit every common word hard
+      // Word replacements
       t = t.replace(/\bi\b/g, 'ai');
       t = t.replace(/\bme\b/g, 'mi');
       t = t.replace(/\byou\b/g, 'yu');
@@ -160,17 +160,16 @@
       t = t.replace(/\bwant\b/g, 'wan');
       t = t.replace(/\blike\b/g, 'raikku');
 
-      // FINAL override: force "billion" to "birrion" (double r) - absolute last step
+      // FINAL override: force "billion" to "birrion" (double r) — absolute last step
       t = t.replace(/\bbillion\b/gi, 'birrion');
 
-      // Extra protection: lock birrion
+      // Lock birrion forever - protect from any further L/R swaps
       t = t.replace(/birrion/gi, 'BIRRION_LOCK');
       t = t.replace(/l/g, 'r');
       t = t.replace(/BIRRION_LOCK/gi, 'birrion');
 
       // NO particles whatsoever
 
-      // Capitalize first letter
       t = t.charAt(0).toUpperCase() + t.slice(1);
 
       return t;
